@@ -12,8 +12,8 @@ Since a lot of people run this on a Pi, this document is going to assume you are
 ## Static IP & Reserved IP
 Go reserve a static ip address on router and/or set it on the linux pc.
     192.168.1.X
-    255.255.255.0
-    192.168.1.1
+    255.255.0.0
+    192.168.0.1
     8.8.4.4, 8.8.8.8
 
 ## Home Assistant
@@ -64,7 +64,7 @@ Enable Remote
 OPTIONAL: If you are using external drives for media storage, they need to be mounted to the hassio share directory.
 For each external drive, change your external drive mountpoint to '/usr/share/hassio/share/YOUR_DRIVE_NAME' 
 Reboot afterwards
-Get the device ids with `sudo fdisk -l`
+Get the device ids with `sudo fdisk -l` or `sudo ls -l /dev/disk/by-id/`
 For each devce id, add them to fstab
 sudo nano /etc/fstab
 /dev/disk/by-id/YOUR_DEVICE_ID /usr/share/hassio/share/YOUR_DRIVE_NAME auto nosuid,nodev,nofail,x-gvfs-show 0 0
@@ -111,6 +111,8 @@ veto_files:
   - Thumbs.db
   - icon?
   - .Trashes
+  - $RECYCLE.BIN
+  - System Volume Information
 compatibility_mode: false
 
 On your Windows PC, open My Computer/This PC
@@ -121,33 +123,45 @@ Next
 \\YOUR_IP_ADDRESS\Share
 Enter your username/password defined in your config
 
-### AdGuard - Home
-Kill ads network-wide.
 
+### Nanoleaf
+Connect your Nanoleaf lights to Home Assistant.
+
+Connect them to your network with your phone.
+Go to your router and find their IP.
+Might not be named, but MAC should start with 00:55:DA
+Reserve that IP so it's always the same.
+Put them in pairing mode. It lasts 30 seconds
+Open a terminal and run `curl -i -X POST http://192.168.1.5:16021/api/v1/new` while it's pairing.
+Copy the TOKEN somewhere.
+Add a light to your configuration.yaml
+
+light:
+  - platform: nanoleaf
+    host: 192.168.3.50
+    token: TOKEN
+
+### FLIC
 Go to Supervisor > Add-On Store
-Search for 'AdGuard Home' and install it
-Start on Boot
-Show in Sidebar
-Turn on auto update
-Update the add-on config 
+Add a repository: https://github.com/pschmitt/home-assistant-addons
+Search for 'flicd' and install it
 
-ssl: true
-certfile: fullchain.pem
-keyfile: privkey.pem
-log_level: info
+Edit the configuration.yaml
 
-Make sure you have a static/reserved ip and external dns. (Mentioned near the top of this.)
-Point your Router DNS to your Static IP
-If you have a Secondary DNS, set it to Google's DNS 8.8.8.8 (Just in case you have issues, you will still have internet)
-Stop and Disable systemd-resolved to prevent issues with AdGuardHome
+device_tracker:
+  - platform: bluetooth_le_tracker
 
-sudo systemctl stop systemd-resolved
-sudo systemctl disable systemd-resolved
+binary_sensor:
+  - platform: flic
+    discovery: true
+    host: localhost
+    port: 5551
 
-Go to AdGuard Home in the sidebar
-Go to Filters>DNS Blocklists
-Turn on some filters.
-Profit
+Start the service
+Press and hold flic for ~7 seconds. There will be a quick flash of the led if it pairs.
+You may need to restart Home Assistant to pair an additional button.
+
+
 
 ## Neat Config Things
 
@@ -195,10 +209,18 @@ Click submit and wait for confirmation.
 ### Themes
 In configuration.yaml we can add support for UI Themes.
 
+Make sure to install HACS above.
+
 frontend:
     themes: !include_dir_merge_named themes
 
 Make a 'themes' folder in your /hassio/config folder. You can add themes there to use.
+Go to HACS in your sidebar.
+Go to Frontend
+Click the "+" button in the bottom right corner
+Search/Scroll to a theme you want, select it, scroll to the bottom, and install it
+Go to your actual user profile in the bottom left
+Select the new theme from the Theme dropdown menu
 
 ### Secrets
 In your /hassio/config folder, you can make a 'secrets.yaml' file and store your usernames, passwords, ssh keys and more. That way, you can share your configurations without having to worry about sharing sensitive information.
