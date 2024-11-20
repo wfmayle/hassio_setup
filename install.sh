@@ -84,17 +84,28 @@ install_dependencies(){
         docker-engine \
         docker.io
 
-    sudo apt-get install -y \
-        apparmor-utils \
-        apt-transport-https \
-        avahi-daemon \
-        ca-certificates \
-        curl \
-        dbus \
+    # sudo apt-get install -y \
+    #     apparmor-utils \
+    #     apt-transport-https \
+    #     avahi-daemon \
+    #     ca-certificates \
+    #     curl \
+    #     dbus \
+    #     jq \
+    #     network-manager \
+    #     socat \
+    #     docker.io
+        
+    sudo apt-get install \
+        apparmor \
         jq \
+        wget \
+        curl \
+        udisks2 \
+        libglib2.0-bin \
         network-manager \
-        socat \
-        docker.io
+        dbus \
+        systemd-journal-remote -y
 }
 
 

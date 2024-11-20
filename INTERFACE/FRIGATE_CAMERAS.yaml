@@ -1,0 +1,41 @@
+type: custom:frigate-card
+cameras:
+  - camera_entity: camera.foscam01_hd
+  - camera_entity: camera.tapocam01_hd
+  - camera_entity: camera.tapocam02_hd
+menu:
+  style: outside
+  position: top
+  button_size: 33
+  buttons:
+    frigate:
+      enabled: false
+    substreams:
+      enabled: false
+    live:
+      enabled: true
+    clips:
+      enabled: false
+    snapshots:
+      enabled: false
+    recordings:
+      enabled: false
+    image:
+      enabled: false
+    download:
+      enabled: false
+    camera_ui:
+      enabled: true
+    timeline:
+      enabled: false
+    microphone:
+      enabled: false
+    media_player:
+      enabled: false
+dimensions: {}
+live:
+  auto_mute: never
+  auto_unmute: all
+view:
+  scan:
+    untrigger_reset: false
